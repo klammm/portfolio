@@ -10,10 +10,9 @@ const Canvas = styled.canvas`
   pointer-events: none;
 `;
 
-// Fog originates over the hills upper-left, sweeps diagonally down through the headline,
-// and dissipates near the piers around 85% width — well short of the orange
-// skyline block on the right. Four control points define a single cubic
-// Bezier through that arc.
+// Fog sits over the hills upper-left, follows the diagonal through the headline and the
+// bridge, and thins out near the piers around 85% width — short of the
+// orange skyline block on the right.
 const PATH = [
   { x: 0.04, y: 0.2 },
   { x: 0.3, y: 0.2 },
@@ -28,26 +27,73 @@ function bezierPoint(t: number, [p0, p1, p2, p3]: typeof PATH) {
   return { x, y };
 }
 
-// Opacity along the path: fades in quickly as fog "arrives" over the hills,
-// holds through the middle, tapers out approaching the piers
-function envelope(u: number) {
-  if (u < 0.15) return u / 0.15;
-  if (u < 0.65) return 1;
-  return Math.max(0, 1 - (u - 0.65) / 0.35);
+function smoothstep(edge0: number, edge1: number, x: number) {
+  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
 }
 
-// Each layer travels the same path on its own loop, staggered so there's
-// always fog somewhere along the sweep rather than the whole effect
-// resetting to empty at once. Sizes shrink layer-to-layer too
-const LAYERS = [
-  { durationMs: 12000, startFrac: 0, baseSize: 0.24, opacity: 0.4, r: 224, g: 229, b: 236 },
-  { durationMs: 13500, startFrac: 0.25, baseSize: 0.2, opacity: 0.32, r: 214, g: 222, b: 232 },
-  { durationMs: 11000, startFrac: 0.5, baseSize: 0.17, opacity: 0.26, r: 232, g: 235, b: 240 },
-  { durationMs: 14500, startFrac: 0.75, baseSize: 0.15, opacity: 0.2, r: 206, g: 216, b: 230 },
-] as const;
+// How much fog exists at a given point along the path — full strength from
+// the hills through the bridge, thinning out over the last stretch toward
+// the piers rather than stopping abruptly.
+function density(u: number) {
+  return 1 - smoothstep(0.58, 0.9, u);
+}
+
+// A fixed chain of puffs strung along the whole path at once — a
+// continuous stream, not a single blob traveling through empty space.
+// Each puff's base position is static; only size/opacity/wobble animate.
+const PUFF_COUNT = 9;
+const U_START = 0.02;
+const U_END = 0.85;
+const LOBES_PER_PUFF = 7;
+
+type Puff = {
+  u: number;
+  cx: number; // fraction of width, fixed
+  cy: number; // fraction of height, fixed
+  baseSize: number; // fraction of width
+  bobPhase: number;
+  pulsePhase: number;
+  lobeAngles: number[];
+  lobeRadii: number[]; // as a fraction of puff size
+};
+
+function buildPuffs(): Puff[] {
+  // Deterministic pseudo-randomness (no Math.random at draw time) so the
+  // shape is stable frame to frame — only position/opacity animate.
+  let seed = 42;
+  const rand = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000) / 1000;
+  };
+
+  const puffs: Puff[] = [];
+  for (let i = 0; i < PUFF_COUNT; i++) {
+    const u = U_START + ((U_END - U_START) * i) / (PUFF_COUNT - 1);
+    const { x, y } = bezierPoint(u, PATH);
+    const d = density(u);
+    const lobeAngles: number[] = [];
+    const lobeRadii: number[] = [];
+    for (let j = 0; j < LOBES_PER_PUFF; j++) {
+      lobeAngles.push((2 * Math.PI * j) / LOBES_PER_PUFF + i * 0.5);
+      lobeRadii.push(0.48 + 0.3 * rand());
+    }
+    puffs.push({
+      u,
+      cx: x,
+      cy: y,
+      baseSize: 0.1 * (0.55 + 0.45 * d) * (0.9 + 0.2 * rand()),
+      bobPhase: rand() * Math.PI * 2,
+      pulsePhase: rand() * Math.PI * 2,
+      lobeAngles,
+      lobeRadii,
+    });
+  }
+  return puffs;
+}
 
 type FogCanvasProps = {
-  /** Optional: scroll speeds up the sweep slightly for a subtle parallax feel. */
+  /** Optional: scroll gently speeds up the bob/pulse motion for a subtle parallax feel. */
   parallax?: boolean;
 };
 
@@ -61,6 +107,7 @@ export function FogCanvas({ parallax = false }: FogCanvasProps) {
     if (!ctx) return;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const puffs = buildPuffs();
 
     let animId = 0;
     let running = false;
@@ -73,38 +120,49 @@ export function FogCanvas({ parallax = false }: FogCanvasProps) {
       canvas.height = canvas.offsetHeight * dpr;
     };
 
-    // Draws one layer's fog mass as a cluster of overlapping blurred lobes
-    // (not a single smooth ellipse) for the rippled "waterfall" texture
-    // positioned at progress `u` (0–1) along PATH.
-    const drawLayer = (layer: (typeof LAYERS)[number], u: number, W: number, H: number) => {
-      const alpha = layer.opacity * envelope(u);
-      if (alpha <= 0.005) return;
+    const drawPuff = (puff: Puff, elapsedMs: number, W: number, H: number) => {
+      const d = density(puff.u);
+      const alpha = 0.62 * Math.max(d, 0.05);
+      if (alpha <= 0.01) return;
 
-      const { x, y } = bezierPoint(u, PATH);
-      const cx = x * W;
-      const cy = y * H;
-      // Shrinks along the path — dense near the hills, thin near the piers.
-      const size = layer.baseSize * (1 - 0.55 * u) * W;
+      const t = (elapsedMs / 1000) * speedMultiplier;
+      // Gentle bob/drift so the stream feels alive without traveling far —
+      // this is a persistent chain, not a moving packet.
+      const bobY = Math.sin(t * 0.35 + puff.bobPhase) * 0.012 * H;
+      const bobX = Math.cos(t * 0.22 + puff.bobPhase) * 0.006 * W;
+      const pulse = 0.9 + 0.12 * Math.sin(t * 0.5 + puff.pulsePhase);
 
-      const lobes = [
-        { dx: 0, dy: 0, scale: 1 },
-        { dx: -size * 0.35, dy: size * 0.12, scale: 0.7 },
-        { dx: size * 0.3, dy: -size * 0.1, scale: 0.6 },
-      ];
+      const cx = puff.cx * W + bobX;
+      const cy = puff.cy * H + bobY;
+      const size = puff.baseSize * W * pulse;
 
       ctx.save();
-      ctx.filter = `blur(${Math.max(14, size * 0.14)}px)`;
-      lobes.forEach((lobe) => {
-        const r = size * lobe.scale;
-        const grad = ctx.createRadialGradient(cx + lobe.dx, cy + lobe.dy, 0, cx + lobe.dx, cy + lobe.dy, r);
-        grad.addColorStop(0, `rgba(${layer.r},${layer.g},${layer.b},${alpha})`);
-        grad.addColorStop(0.6, `rgba(${layer.r},${layer.g},${layer.b},${alpha * 0.6})`);
-        grad.addColorStop(1, `rgba(${layer.r},${layer.g},${layer.b},0)`);
+      ctx.filter = `blur(${Math.max(5, size * 0.06)}px)`;
+      puff.lobeAngles.forEach((angle, j) => {
+        const rOffset = size * 0.4;
+        const lx = cx + Math.cos(angle) * rOffset;
+        const ly = cy + Math.sin(angle) * rOffset * 0.65;
+        const lobeR = size * puff.lobeRadii[j];
+        const a = alpha;
+        const grad = ctx.createRadialGradient(lx, ly, 0, lx, ly, lobeR);
+        grad.addColorStop(0, `rgba(226,231,238,${a})`);
+        grad.addColorStop(0.7, `rgba(226,231,238,${a * 0.75})`);
+        grad.addColorStop(1, 'rgba(226,231,238,0)');
         ctx.beginPath();
-        ctx.arc(cx + lobe.dx, cy + lobe.dy, r, 0, Math.PI * 2);
+        ctx.arc(lx, ly, lobeR, 0, Math.PI * 2);
         ctx.fillStyle = grad;
         ctx.fill();
       });
+      // Center lobe ties the cluster together.
+      const centerR = size * 0.62;
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, centerR);
+      grad.addColorStop(0, `rgba(230,234,240,${alpha})`);
+      grad.addColorStop(0.7, `rgba(230,234,240,${alpha * 0.75})`);
+      grad.addColorStop(1, 'rgba(230,234,240,0)');
+      ctx.beginPath();
+      ctx.arc(cx, cy, centerR, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
       ctx.restore();
     };
 
@@ -112,13 +170,7 @@ export function FogCanvas({ parallax = false }: FogCanvasProps) {
       const W = canvas.width;
       const H = canvas.height;
       ctx.clearRect(0, 0, W, H);
-
-      LAYERS.forEach((layer) => {
-        const cycle = layer.durationMs / speedMultiplier;
-        const raw = (elapsedMs + layer.startFrac * layer.durationMs) / cycle;
-        const u = ((raw % 1) + 1) % 1;
-        drawLayer(layer, u, W, H);
-      });
+      puffs.forEach((puff) => drawPuff(puff, elapsedMs, W, H));
     };
 
     const loop = (now: number) => {
@@ -143,10 +195,8 @@ export function FogCanvas({ parallax = false }: FogCanvasProps) {
     resize();
 
     if (reduceMotion) {
-      // Freeze partway along the sweep instead of animating.
-      drawFrame(LAYERS[0].durationMs * 0.35);
+      drawFrame(0);
     } else {
-      // Only run the loop while the canvas is actually on screen.
       const io = new IntersectionObserver(
         ([entry]) => (entry.isIntersecting ? start() : stop()),
         { threshold: 0 },
