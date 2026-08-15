@@ -1,6 +1,6 @@
 export const profile = {
   name: 'Kevin Lam',
-  role: 'Senior Frontend Engineer',
+  role: 'Software Engineer',
   location: 'San Francisco Bay Area',
   email: 'kevinlam.sf@gmail.com',
   phone: '415-828-2669',
