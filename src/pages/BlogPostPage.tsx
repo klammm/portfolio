@@ -93,7 +93,7 @@ export function BlogPostPage() {
 
         {/* Optional live demo referenced by the post's `demo:` frontmatter field.
             Rendered outside <Prose> — it's a real interactive component, not markdown content. */}
-        {demo && <DemoFrame demo={demo} />}
+        {/* {demo && <DemoFrame demo={demo} />} */}
       </Wrap>
     </Section>
   );

@@ -122,7 +122,7 @@ const navItems: [string, string][] = [
   ['Experience', '/#experience'],
   ['Skills', '/#skills'],
   ['Blog', '/blog'],
-  ['Playground', '/playground'],
+  // ['Playground', '/playground'],
   ['Contact', '/#contact'],
 ];
 
