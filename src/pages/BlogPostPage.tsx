@@ -6,8 +6,8 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
 import styled from 'styled-components';
 import { getPostBySlug } from '../features/blog/blog';
-import { DemoFrame } from '../features/playground/DemoFrame';
-import { getDemoBySlug } from '../features/playground/registry';
+// import { DemoFrame } from '../features/playground/DemoFrame';
+// import { getDemoBySlug } from '../features/playground/registry';
 import { Prose } from '../theme/Prose';
 
 const Section = styled.section`
@@ -66,7 +66,7 @@ function formatDate(iso: string) {
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const post = slug ? getPostBySlug(slug) : undefined;
-  const demo = post?.demo ? getDemoBySlug(post.demo) : undefined;
+  // const demo = post?.demo ? getDemoBySlug(post.demo) : undefined;
 
   if (!post) {
     // Unknown slug — send back to the index rather than showing a dead page.
