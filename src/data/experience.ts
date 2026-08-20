@@ -11,9 +11,9 @@ export const experience: ExperienceItem[] = [
     role: 'Senior Frontend Engineer',
     dates: 'May 2024 - Jan 2026',
     highlights: [
-      'Led the first pass of the workflow builder redesign and rebuilt the canvas with React Flow.',
-      'Added Storybook and Chromatic so the frontend team had a better place to document and review components.',
-      'Helped move design tokens and theming from Emotion to Material UI.',
+      'Built the frontend architecture and dashboard experience for a workflow automation platform, working extensively with data-heavy tables, filters, and complex UI states.',
+      'Built and standardized a component library and design system with Storybook, Chromatic, and Material UI, integrating visual regression testing and automated deployments through GitHub Actions.',
+      'Led the first pass of the workflow builder redesign and rebuilt the canvas experience with React Flow.',
     ],
   },
   {
@@ -21,9 +21,9 @@ export const experience: ExperienceItem[] = [
     role: 'Senior Software Engineer',
     dates: 'Mar 2020 - Apr 2024',
     highlights: [
-      'Worked on Fender features including Shop Bundles, Engagement pages, Home 2.0, and Streaks 2.0.',
-      'Migrated parts of the app to Next.js and TypeScript, with Contentful content coming through GraphQL.',
-      'Spent a lot of time on code review, Cypress cleanup, responsive polish, accessibility, and analytics.',
+      'Built user-facing experiences for Fender, including the Online Web Tuner, video player redesign, Shop Bundles, Engagement pages, Home 2.0, and Streaks 2.0.',
+      'Led accessibility improvements across Fender ecommerce and Fender Play, improving experiences for keyboard and screen reader users.',
+      'Migrated parts of the application to Next.js and TypeScript, while working with Contentful and GraphQL to power content-driven experiences.',
     ],
   },
   {
@@ -31,9 +31,9 @@ export const experience: ExperienceItem[] = [
     role: 'Software Engineer',
     dates: 'Jul 2017 - Sep 2019',
     highlights: [
-      'Rebuilt the global header and footer in plain JavaScript and removed lodash from that path.',
-      'Built React A/B testing modules used in ecommerce experiments.',
-      'Worked on accessibility and analytics performance, including reducing beacon dispatches.',
+      'Rebuilt Walmart’s global header and footer in plain JavaScript, removing lodash from the critical path and improving performance.',
+      'Built React A/B testing modules used across ecommerce experiments.',
+      'Improved accessibility and analytics performance, including reducing unnecessary beacon dispatches.',
     ],
   },
 ];

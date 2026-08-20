@@ -21,7 +21,7 @@ export const projects: Project[] = [
     tag: 'Rewst',
     description:
       'Worked on analytics views, workflow summary cards, activity feeds, and large tables with filtering and date range controls.',
-    impact: 'React Table, Material UI, filtering UX',
+    impact: 'React Table, Material UI, filtering UX, Dashboard frontend architecture',
   },
   {
     title: 'Fender web app',
