@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Menu, Moon, Sun, X } from 'lucide-react';
+import { Link, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { profile } from '../../data/profile';
 import type { ThemeName } from '../../theme/theme';
@@ -24,7 +25,7 @@ const Bar = styled.header`
   }
 `;
 
-const Brand = styled.a`
+const Brand = styled(Link)`
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -69,15 +70,16 @@ const Nav = styled.nav<{ $open: boolean }>`
   }
 `;
 
-const NavLink = styled.a`
+const NavLink = styled(Link)<{ $active?: boolean }>`
   min-height: 40px;
   display: flex;
   align-items: center;
   padding: 0.58rem 0.85rem;
   border-radius: ${({ theme }) => theme.radius};
-  color: ${({ theme }) => theme.colors.textMuted};
+  color: ${({ theme, $active }) => ($active ? theme.colors.text : theme.colors.textMuted)};
   font-size: 0.93rem;
   font-weight: 700;
+  background: ${({ theme, $active }) => ($active ? theme.colors.bgMuted : 'transparent')};
 
   &:hover {
     background: ${({ theme }) => theme.colors.bgMuted};
@@ -116,10 +118,12 @@ const NavToggle = styled(IconButton)`
 `;
 
 const navItems: [string, string][] = [
-  ['Work', '#work'],
-  ['Experience', '#experience'],
-  ['Skills', '#skills'],
-  ['Contact', '#contact'],
+  ['Work', '/#work'],
+  ['Experience', '/#experience'],
+  ['Skills', '/#skills'],
+  ['Blog', '/blog'],
+  ['Playground', '/playground'],
+  ['Contact', '/#contact'],
 ];
 
 type HeaderProps = {
@@ -130,19 +134,20 @@ type HeaderProps = {
 export function Header({ theme, onToggleTheme }: HeaderProps) {
   const [navOpen, setNavOpen] = useState(false);
   const closeNav = () => setNavOpen(false);
+  const location = useLocation();
 
   const items = useMemo(() => navItems, []);
 
   return (
     <Bar>
-      <Brand href="#top" onClick={closeNav} aria-label={`${profile.name} home`}>
+      <Brand to="/" onClick={closeNav} aria-label={`${profile.name} home`}>
         <BrandMark>KL</BrandMark>
         <span>{profile.name}</span>
       </Brand>
 
       <Nav $open={navOpen} aria-label="Primary navigation">
-        {items.map(([label, href]) => (
-          <NavLink key={href} href={href} onClick={closeNav}>
+        {items.map(([label, to]) => (
+          <NavLink key={to} to={to} onClick={closeNav} $active={to.startsWith('/') && !to.includes('#') && location.pathname.startsWith(to)}>
             {label}
           </NavLink>
         ))}

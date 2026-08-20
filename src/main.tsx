@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 import { ThemeProvider } from 'styled-components';
 import { Analytics } from '@vercel/analytics/react';
 import App from './App';
@@ -16,7 +17,9 @@ function Root() {
   return (
     <ThemeProvider theme={themes[themeName]}>
       <GlobalStyle />
-      <App theme={themeName} onToggleTheme={() => setThemeName(themeName === 'dark' ? 'light' : 'dark')} />
+      <BrowserRouter>
+        <App theme={themeName} onToggleTheme={() => setThemeName(themeName === 'dark' ? 'light' : 'dark')} />
+      </BrowserRouter>
       <Analytics />
     </ThemeProvider>
   );
