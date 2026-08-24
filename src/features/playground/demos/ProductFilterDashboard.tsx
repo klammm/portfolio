@@ -1,6 +1,6 @@
 // import React from 'react';
 
-const ProductFilterDashboad = () => {
+export const ProductFilterDashboard = () => {
   return (
     <div>
       Hello World
@@ -8,4 +8,4 @@ const ProductFilterDashboad = () => {
   )
 };
 
-export default ProductFilterDashboad
+export default ProductFilterDashboard
