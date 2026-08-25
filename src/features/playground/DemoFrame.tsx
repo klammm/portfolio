@@ -36,7 +36,6 @@ type DemoFrameProps = {
 export function DemoFrame({ demo, showHeading = true }: DemoFrameProps) {
   const { Component } = demo;
 
-  console.log('>>> demo', demo);
   return (
     <Frame>
       {showHeading && (

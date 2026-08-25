@@ -13,7 +13,7 @@ Features:
 -   product list x
 -   search input x
 -   category filter x
--   price filter
+-   price filter x
 -   sort dropdown
 -   selected product
 -   loading state
@@ -47,15 +47,34 @@ export interface Product {
 export const ProductFilterDashboard = () => {
   const [searchInput, setSearchInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [priceFilter, setPriceFilter] = useState({ min: 0, max: 0 });
 
   const itemsToRender = PRODUCTS.filter(product => {
     const searchInputMatch = product.name.toLowerCase().includes(searchInput.toLowerCase());
     const categoryFilterMatch = selectedCategory === '' || product.category === selectedCategory; 
-    return searchInputMatch && categoryFilterMatch;
+    const matchesMinPrice = priceFilter.min === 0 || priceFilter.min <= product.price;
+    const matchesMaxPrice = priceFilter.max === 0 || priceFilter.max >= product.price;
+    const priceFilterMatch = matchesMinPrice && matchesMaxPrice;
+
+    return searchInputMatch && categoryFilterMatch && priceFilterMatch;
   });
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
+  };
+
+  const handlePriceFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.name.includes('min')) {
+      setPriceFilter(prevState => ({
+        ...prevState,
+        min: Number(e.target.value),
+      }));
+    } else if (e.target.name.includes('max')) {
+      setPriceFilter(prevState => ({
+        ...prevState,
+        max: Number(e.target.value),
+      }));
+    }
   };
 
   const handleOnCategorySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -76,6 +95,14 @@ export const ProductFilterDashboard = () => {
           )
         })}
       </select>
+      <label htmlFor='product-filter-dashboad-pricefilter-min'>
+        Min
+      </label>
+      <input type="number" value={priceFilter.min} onChange={handlePriceFilterChange} id="product-filter-dashboad-pricefilter-min" name="product-filter-dashboad-pricefilter-min" />
+      <label htmlFor='product-filter-dashboad-pricefilter-max'>
+        Max
+      </label>
+      <input type="number" value={priceFilter.max} onChange={handlePriceFilterChange} id="product-filter-dashboad-pricefilter-max" name="product-filter-dashboad-pricefilter-max" />
       <div>
         <ul>
           {itemsToRender.map((product) => {
