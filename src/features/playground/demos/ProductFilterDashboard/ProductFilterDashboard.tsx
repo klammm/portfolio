@@ -15,7 +15,7 @@ Features:
 -   category filter x
 -   price filter x
 -   sort dropdown x
--   selected product
+-   selected product x
 -   loading state
 -   empty state
 
@@ -52,6 +52,7 @@ export const ProductFilterDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [priceFilter, setPriceFilter] = useState({ min: 0, max: 0 });
   const [sortFilter, setSortFilter] = useState<SortFilter>('none');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const itemsToRender = PRODUCTS.filter(product => {
     const searchInputMatch = product.name.toLowerCase().includes(searchInput.toLowerCase());
@@ -89,6 +90,10 @@ export const ProductFilterDashboard = () => {
 
   const handleSortOnSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortFilter(e.target.value as SortFilter);
+  };
+
+  const handleProductOnClick = (product: Product) => {
+    setSelectedProduct(product);
   };
 
   return (
@@ -132,11 +137,16 @@ export const ProductFilterDashboard = () => {
         })}
       </select>
       <div>
+        {selectedProduct && (
+          <p>
+            {selectedProduct.name} - {selectedProduct.category} - ${selectedProduct.price}
+          </p>
+        )}
         <ul>
           {itemsToSort.map((product) => {
             
             return (
-              <li key={product.id}>
+              <li key={product.id} value={product.name} onClick={() => handleProductOnClick(product)}>
                 {product.name} - {product.category} - ${product.price}
               </li>
             )
