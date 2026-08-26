@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import { PRODUCTS } from './mockData';
+import { fetchMockProducts } from './mockData';
 /*
 Build Exercise
 
@@ -16,7 +16,7 @@ Features:
 -   price filter x
 -   sort dropdown x
 -   selected product x
--   loading state
+-   loading state x
 -   empty state x
 
 Constraints:
@@ -35,7 +35,7 @@ Add:
 -   result count x
 */
 
-const categoryList = [...new Set(PRODUCTS.map(p => p.category))];
+
 const SORT_FILTERS = ['asc', 'desc'];
 
 export interface Product {
@@ -53,8 +53,12 @@ export const ProductFilterDashboard = () => {
   const [priceFilter, setPriceFilter] = useState({ min: 0, max: 0 });
   const [sortFilter, setSortFilter] = useState<SortFilter>('none');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const itemsToRender = PRODUCTS.filter(product => {
+  const categoryList = [...new Set(products.map(p => p.category))];
+
+  const itemsToRender = products.filter(product => {
     const searchInputMatch = product.name.toLowerCase().includes(searchInput.toLowerCase());
     const categoryFilterMatch = selectedCategory === '' || product.category === selectedCategory; 
     const matchesMinPrice = priceFilter.min === 0 || priceFilter.min <= product.price;
@@ -96,6 +100,33 @@ export const ProductFilterDashboard = () => {
   const handleProductOnClick = (product: Product) => {
     setSelectedProduct(product);
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchProducts = async() => {
+      try {
+        const res = await fetchMockProducts();
+        setProducts(res);
+      } catch(e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (!cancelled) {
+      fetchProducts();
+    }
+
+    return () => {
+      cancelled = true;
+    }
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading....</div>
+  }
 
   return (
     <div>

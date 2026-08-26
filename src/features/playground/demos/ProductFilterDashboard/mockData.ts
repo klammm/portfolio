@@ -27,3 +27,9 @@ export const PRODUCTS: Product[] = [
   { id: '24', name: 'Whiteboard', category: 'Office Supplies', price: 65 },
   { id: '25', name: 'Paper Shredder', category: 'Office Supplies', price: 89 },
 ];
+
+export const fetchMockProducts = (): Promise<Product[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(PRODUCTS), 600);
+  })
+}
