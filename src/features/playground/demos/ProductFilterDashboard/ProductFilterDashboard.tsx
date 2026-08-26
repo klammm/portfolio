@@ -30,8 +30,8 @@ Stretch
 
 Add:
 
--   URL query parameters for filters
--   reset filters
+-   URL query parameters for filters 
+-   reset filters x
 -   result count x
 */
 
@@ -101,6 +101,13 @@ export const ProductFilterDashboard = () => {
     setSelectedProduct(product);
   };
 
+  const handleResetFilterOnClick = () => {
+    setSearchInput('');
+    setSelectedCategory('');
+    setPriceFilter({ min: 0, max: 0});
+    setSortFilter('none');
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -135,7 +142,7 @@ export const ProductFilterDashboard = () => {
       <label htmlFor='product-filter-dashboard-category-filter'>
         Filter by Category
       </label>
-      <select onChange={handleOnCategorySelect} id="product-filter-dashboard-category-filter" name="product-filter-dashboard-category-filter">
+      <select value={selectedCategory} onChange={handleOnCategorySelect} id="product-filter-dashboard-category-filter" name="product-filter-dashboard-category-filter">
         <option value="">Show all categories</option>
         {categoryList.map((category) => {
           return (
@@ -156,7 +163,7 @@ export const ProductFilterDashboard = () => {
       <label htmlFor='product-filter-dashboard-sort-filter'>
         Select to sort
       </label>
-      <select onChange={handleSortOnSelect} id="product-filter-dashboard-sort-filter" name="product-filter-dashboard-sort-filter">
+      <select value={sortFilter} onChange={handleSortOnSelect} id="product-filter-dashboard-sort-filter" name="product-filter-dashboard-sort-filter">
         <option value="none">
           No sort applied
         </option>
@@ -168,6 +175,9 @@ export const ProductFilterDashboard = () => {
           )
         })}
       </select>
+      <button type="button" onClick={handleResetFilterOnClick}>
+        Clear filters
+      </button>
       <div>
         <p>{itemLength} results shown</p>
         {selectedProduct && (
