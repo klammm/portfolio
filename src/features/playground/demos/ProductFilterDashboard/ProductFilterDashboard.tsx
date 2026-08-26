@@ -32,7 +32,7 @@ Add:
 
 -   URL query parameters for filters
 -   reset filters
--   result count
+-   result count x
 */
 
 const categoryList = [...new Set(PRODUCTS.map(p => p.category))];
@@ -65,6 +65,7 @@ export const ProductFilterDashboard = () => {
   });
 
   const itemsToSort = sortFilter === 'none' ? itemsToRender : [...itemsToRender].sort((a, b) => sortFilter === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+  const itemLength = itemsToSort.length;
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
@@ -137,6 +138,7 @@ export const ProductFilterDashboard = () => {
         })}
       </select>
       <div>
+        <p>{itemLength} results shown</p>
         {selectedProduct && (
           <p>
             {selectedProduct.name} - {selectedProduct.category} - ${selectedProduct.price}
