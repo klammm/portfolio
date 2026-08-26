@@ -17,7 +17,7 @@ Features:
 -   sort dropdown x
 -   selected product x
 -   loading state
--   empty state
+-   empty state x
 
 Constraints:
 
@@ -143,14 +143,15 @@ export const ProductFilterDashboard = () => {
           </p>
         )}
         <ul>
-          {itemsToSort.map((product) => {
-            
-            return (
-              <li key={product.id} value={product.name} onClick={() => handleProductOnClick(product)}>
-                {product.name} - {product.category} - ${product.price}
-              </li>
-            )
-        })}
+          {itemsToSort.length > 0 ? itemsToSort.map((product) => (
+            <li key={product.id} value={product.name} onClick={() => handleProductOnClick(product)}>
+              {product.name} - {product.category} - ${product.price}
+            </li>
+          )) : (
+            <div>
+              No products found
+            </div>
+          )}
         </ul>
       </div>
     </div>
