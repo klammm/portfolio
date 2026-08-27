@@ -37,7 +37,7 @@ Add:
 */
 
 
-const SORT_FILTERS = ['asc', 'desc'];
+const SORT_FILTERS = ['name-asc', 'name-desc', 'price-asc', 'price-desc'];
 
 export interface Product {
   id: string;
@@ -46,7 +46,7 @@ export interface Product {
   price: number;
 }
 
-type SortFilter = 'none' | 'asc' | 'desc';
+type SortFilter = 'none' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 
 export const ProductFilterDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -77,7 +77,17 @@ export const ProductFilterDashboard = () => {
     return searchInputMatch && categoryFilterMatch && priceFilterMatch;
   });
 
-  const itemsToSort = sortFilter === 'none' ? itemsToRender : [...itemsToRender].sort((a, b) => sortFilter === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+  const itemsToSort = sortFilter === 'none' ? itemsToRender : [...itemsToRender].sort((a, b) => {
+    if (sortFilter === 'name-asc') {
+      return a.name.localeCompare(b.name);
+    } else if (sortFilter === 'name-desc') {
+      return b.name.localeCompare(a.name);
+    } else if (sortFilter === 'price-asc') {
+      return a.price - b.price;
+    } else {
+      return b.price - a.price;
+    }
+  });
   const itemLength = itemsToSort.length;
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
