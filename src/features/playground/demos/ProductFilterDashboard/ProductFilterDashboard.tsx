@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { fetchMockProducts } from './mockData';
 /*
@@ -30,7 +31,7 @@ Stretch
 
 Add:
 
--   URL query parameters for filters 
+-   URL query parameters for filters x
 -   reset filters x
 -   result count x
 */
@@ -48,10 +49,18 @@ export interface Product {
 type SortFilter = 'none' | 'asc' | 'desc';
 
 export const ProductFilterDashboard = () => {
-  const [searchInput, setSearchInput] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [priceFilter, setPriceFilter] = useState({ min: 0, max: 0 });
-  const [sortFilter, setSortFilter] = useState<SortFilter>('none');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [searchInput, setSearchInput] = useState(() => searchParams.get('searchInput') ?? '');
+  const [selectedCategory, setSelectedCategory] = useState(() => searchParams.get('selectedCategory') ?? '');
+  const [priceFilter, setPriceFilter] = useState(() => {
+    const priceObj = { min: 0, max: 0 };
+    priceObj.min = Number(searchParams.get('min')  ?? 0);
+    priceObj.max = Number(searchParams.get('max') ?? 0);
+
+    return priceObj;
+  });
+  const [sortFilter, setSortFilter] = useState<SortFilter>(() => searchParams.get('sortFilter') as SortFilter ?? 'none');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,6 +82,10 @@ export const ProductFilterDashboard = () => {
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
+    setSearchParams(_searchParams => {
+      _searchParams.set("searchInput", e.target.value);
+      return _searchParams;
+    });
   };
 
   const handlePriceFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,20 +94,36 @@ export const ProductFilterDashboard = () => {
         ...prevState,
         min: Number(e.target.value),
       }));
+      setSearchParams(_searchParams => {
+        _searchParams.set('min', e.target.value);
+        return _searchParams;
+      });
     } else if (e.target.name.includes('max')) {
       setPriceFilter(prevState => ({
         ...prevState,
         max: Number(e.target.value),
       }));
+      setSearchParams(_searchParams => {
+        _searchParams.set('max', e.target.value);
+        return _searchParams;
+      });
     }
   };
 
   const handleOnCategorySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(e.target.value);
+    setSearchParams(_searchParams => {
+      _searchParams.set("selectedCategory", e.target.value);
+      return _searchParams;
+    });
   };
 
   const handleSortOnSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortFilter(e.target.value as SortFilter);
+    setSearchParams(_searchParams => {
+      _searchParams.set('sortFilter', e.target.value);
+      return _searchParams;
+    })
   };
 
   const handleProductOnClick = (product: Product) => {
@@ -106,6 +135,7 @@ export const ProductFilterDashboard = () => {
     setSelectedCategory('');
     setPriceFilter({ min: 0, max: 0});
     setSortFilter('none');
+    setSearchParams({}, { replace: true });
   };
 
   useEffect(() => {
