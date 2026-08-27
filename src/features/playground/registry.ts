@@ -15,7 +15,7 @@ export const demos: PlaygroundDemo[] = [
   {
     slug: 'product-filter-dashboard',
     title: 'Product Filter Dashboard',
-    description: ' **🚧 WORK IN PROGRESS 🚧** Search, category filter, price filter, and sort — from Day 1 of the study plan. ',
+    description: ' Search, category filter, price filter, and sort demo using Pokemon and One Piece Trading Cards as part of my interview prep.',
     Component: lazy(() =>
       import('./demos/ProductFilterDashboard/ProductFilterDashboard').then((m) => ({ default: m.ProductFilterDashboard })),
     ),
