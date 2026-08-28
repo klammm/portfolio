@@ -15,9 +15,17 @@ export const demos: PlaygroundDemo[] = [
   {
     slug: 'product-filter-dashboard',
     title: 'Product Filter Dashboard',
-    description: ' Search, category filter, price filter, and sort demo using Pokemon and One Piece Trading Cards as part of my interview prep.',
+    description: ' Search, category filter, price filter, and sort demo using Pokemon and One Piece Trading Cards as part of state fundamentals practice.',
     Component: lazy(() =>
       import('./demos/ProductFilterDashboard/ProductFilterDashboard').then((m) => ({ default: m.ProductFilterDashboard })),
+    ),
+  },
+  {
+    slug: 'debounced-search',
+    title: 'Debounced Search and Stopwatch Timer',
+    description: 'Debounced Search and a Stopwatch Timer as part of state closures practice',
+    Component: lazy(() =>
+      import('./demos/DebouncedSearch/DebouncedSearch').then((m) => ({ default: m.DebouncedSearch })),
     ),
   },
 ];
