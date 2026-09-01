@@ -513,10 +513,11 @@ export const characters: Character[] = [
 ];
 
 export const searchCharacters = async (query: string) => {
+  const random = Math.random();
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  if (!query) {
-    return [];
+  if (random < 0.25) {
+    throw new Error("Beep boop. Server crapped out. Please try refreshing!");
   }
 
   return characters.filter((character) =>

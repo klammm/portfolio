@@ -34,7 +34,7 @@ export const DebouncedSearch = () => {
   const [searchInput, setSearchInput] = useState('');
   const [searchResults, setSearchResults] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const debouncedSearchInput = useDebouncedValue(searchInput, 500);
 
@@ -59,7 +59,9 @@ export const DebouncedSearch = () => {
         }
       } catch(e) {
         if (cancelled) return;
-        setError(e as string);
+        const errorMessage = e instanceof Error ? e.message : "Something went wrong";
+        setError(errorMessage);
+        setSearchResults([]);
         console.error(e);
       } finally {
         if (!cancelled) {
