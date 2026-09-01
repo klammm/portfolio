@@ -16,7 +16,7 @@ Build:
 -   results x
 -   empty state x
 -   error state x
--   clear button
+-   clear button x
 
 Additional Exercise
 
@@ -89,8 +89,10 @@ export const DebouncedSearch = () => {
         Start typing here to search!
       </label>
       <input type="text" value={searchInput} onChange={handleSearchInputOnChange} id="debounced-search-input" name="debounced-search-input" />
-
-      {searchInput}
+      <button type="button" onClick={() => setSearchInput("")}>
+        Clear search results
+      </button>
+      
 
       <div>
         {error && (
