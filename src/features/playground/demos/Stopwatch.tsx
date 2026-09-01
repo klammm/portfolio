@@ -4,36 +4,22 @@ Build a timer:
 
 -   start x
 -   pause x
--   reset
--   elapsed time
+-   reset x
+-   elapsed time x
 -   cleanup
 */
 export const Stopwatch = () => {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [now, setNow] = useState<Date | null>(null);
-  const [paused, setPaused] = useState(false);
-  const intervalRef = useRef<number | undefined>(undefined);
-
-  let secondsPassed = 0;
+  const [accumulatedTime, setAccumulatedTime] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
   
-  if (startTime !== null && now !== null) {
-    secondsPassed = (now - startTime) / 1000;
-  }
+  const secondsPassed = startTime && now ? (accumulatedTime + (now.getTime() - startTime.getTime())) / 1000 : accumulatedTime / 1000;
 
   const handleStart = () => {
     const currentTime = new Date();
-
-    if (!paused) {
-      setStartTime(currentTime);
-    } else {
-      const duration = currentTime - now;
-      setStartTime(prev => new Date(prev?.getTime() + duration));
-    }
-
+    setStartTime(currentTime);
     setNow(currentTime);
-    clearInterval(intervalRef.current);
-    setPaused(false);
-
     intervalRef.current = setInterval(() => {
       setNow(new Date());
     }, 10)
@@ -41,14 +27,17 @@ export const Stopwatch = () => {
 
   const handlePause = () => {
     clearInterval(intervalRef.current);
-    setPaused(true);
+    if (startTime && now) {
+      setAccumulatedTime(prev => prev + (now.getTime() - startTime.getTime()));
+    }
+    setStartTime(null);
   };
 
   const handleReset = () => {
-    setStartTime(new Date());
-    setNow(new Date());
-    setPaused(false);
     clearInterval(intervalRef.current);
+    setAccumulatedTime(0);
+    setStartTime(null);
+    setNow(null);
   };
 
   return (
