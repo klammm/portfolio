@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { debounce } from '../../../../utils/debounce';
+import { useDebouncedValue } from '../../../../hooks/useDebouncedValue';
 import { searchCharacters, type Character } from './mockData';
 /*
 Build Exercise
@@ -13,9 +13,9 @@ Build:
 -   300–500ms debounce x
 -   loading state x
 -   API request x
--   results
--   empty state
--   error state
+-   results x
+-   empty state x
+-   error state x
 -   clear button
 
 Additional Exercise
@@ -36,33 +36,44 @@ export const DebouncedSearch = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const debouncedSearchInput = useDebouncedValue(searchInput, 500);
+
   const handleSearchInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
   };
 
   useEffect(() => {
-    const fetchCharacters = async () => {
-      if (!searchInput) return;
+    let cancelled = false;
 
+    const fetchCharacters = async () => {
       setIsLoading(true);
+      setError("");
 
       try {
-        const res = await searchCharacters(searchInput);
+        if (cancelled) return;
+
+        const res = await searchCharacters(debouncedSearchInput);
+
         if (res) {
           setSearchResults(res);
         }
       } catch(e) {
+        if (cancelled) return;
         setError(e as string);
         console.error(e);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
-    const debouncedFetchCharacters = debounce(fetchCharacters, 500);
+    fetchCharacters();
 
-    debouncedFetchCharacters();
-  }, [searchInput])
+    return () => {
+      cancelled = true;
+    }
+  }, [debouncedSearchInput])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -85,7 +96,7 @@ export const DebouncedSearch = () => {
             Something went wrong! Message: {error}
           </p>
         )}
-        {searchResults.map((result) => {
+        {searchResults.length === 0 && debouncedSearchInput ? (<p>No One Piece character found 😭</p>) : searchResults.map((result) => {
           return (
             <p key={result.id}>
               {result.name}
