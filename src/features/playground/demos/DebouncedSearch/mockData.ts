@@ -516,7 +516,7 @@ export const searchCharacters = async (query: string) => {
   const random = Math.random();
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  if (random < 0.25) {
+  if (random < 0.1) {
     throw new Error("Beep boop. Server crapped out. Please try refreshing!");
   }
 

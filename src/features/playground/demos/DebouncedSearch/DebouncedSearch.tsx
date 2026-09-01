@@ -243,10 +243,18 @@ const ErrorBanner = styled.div`
 export const DebouncedSearch = () => {
   const [searchInput, setSearchInput] = useState('');
   const [searchResults, setSearchResults] = useState<Character[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [lastResolvedQuery, setLastResolvedQuery] = useState<string | null>(
+    null,
+  );
+
   const debouncedSearchInput = useDebouncedValue(searchInput, 500);
+  const activeQuery = searchInput === '' ? '' : debouncedSearchInput;
+
+  const hasSearched = activeQuery.length > 0;
+  const isLoading = hasSearched && activeQuery !== lastResolvedQuery;
+  const resultCount = searchResults.length;
 
   const handleSearchInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
@@ -254,38 +262,33 @@ export const DebouncedSearch = () => {
 
   const handleClearOnClick = () => {
     setSearchInput('');
-    setSearchResults([]);
-    setError(null);
   };
 
   useEffect(() => {
     let cancelled = false;
 
     const fetchCharacters = async () => {
-      // if (!debouncedSearchInput) {
-      //   setSearchResults([]);
-      //   return;
-      // }
-
-      setIsLoading(true);
-      setError(null);
-
+      if (!activeQuery) {
+        setSearchResults([]);
+        setError(null);
+        setLastResolvedQuery(null);
+        return;
+      }
+      
       try {
-        const res = await searchCharacters(debouncedSearchInput);
+        const res = await searchCharacters(activeQuery);
 
-        if (!cancelled) {
-          setSearchResults(res);
-        }
+        if (cancelled) return;
+        setSearchResults(res);
+        setError(null);
+        setLastResolvedQuery(activeQuery);
       } catch (e) {
         if (cancelled) return;
         const errorMessage = e instanceof Error ? e.message : 'Something went wrong';
-        setError(errorMessage);
         setSearchResults([]);
+        setError(errorMessage);
+        setLastResolvedQuery(activeQuery);
         console.error(e);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
       }
     };
 
@@ -294,10 +297,53 @@ export const DebouncedSearch = () => {
     return () => {
       cancelled = true;
     };
-  }, [debouncedSearchInput]);
+  }, [activeQuery]);
 
-  const hasSearched = debouncedSearchInput.length > 0;
-  const resultCount = searchResults.length;
+  let content: React.ReactNode = null;
+
+  if (isLoading) {
+    content = <LoadingState>Loading...</LoadingState>;
+  } else if (hasSearched && error) {
+    content = null;
+  } else if (hasSearched && resultCount === 0) {
+    content = <EmptyState>No One Piece character found 😭</EmptyState>;
+  } else if (hasSearched) {
+    content = (
+      <>
+        <ResultsHeader>
+          <ResultCount>
+            {resultCount} {resultCount === 1 ? 'result' : 'results'} for
+            &nbsp;“{activeQuery}”
+          </ResultCount>
+        </ResultsHeader>
+
+        <CharacterList>
+          {searchResults.map((character) => (
+            <CharacterCard key={character.id}>
+              <CardTopRow>
+                <CardName>{character.name}</CardName>
+              </CardTopRow>
+
+              <CardRole>
+                {character.role} · {character.crew}
+              </CardRole>
+
+              <CardBounty>{formatBounty(character.bounty)}</CardBounty>
+
+              <CardDescription>{character.description}</CardDescription>
+
+              <TagRow>
+                <Tag>{character.affiliation}</Tag>
+                {character.devilFruit && (
+                  <DevilFruitTag>{character.devilFruit}</DevilFruitTag>
+                )}
+              </TagRow>
+            </CharacterCard>
+          ))}
+        </CharacterList>
+      </>
+    );
+  }
 
   return (
     <Wrap>
@@ -330,55 +376,13 @@ export const DebouncedSearch = () => {
         </ClearButton>
       </Controls>
 
-      {error && (
+      {hasSearched && error && (
         <ErrorBanner role="alert">
           Something went wrong! Message: {error}
         </ErrorBanner>
       )}
 
-      {isLoading ? (
-        <LoadingState>Loading...</LoadingState>
-      ) : (
-        <>
-          {hasSearched && !error && (
-            <ResultsHeader>
-              <ResultCount>
-                {resultCount} {resultCount === 1 ? 'result' : 'results'} for
-                &nbsp;“{debouncedSearchInput}”
-              </ResultCount>
-            </ResultsHeader>
-          )}
-
-          {hasSearched && resultCount === 0 && !error ? (
-            <EmptyState>No One Piece character found 😭</EmptyState>
-          ) : (
-            <CharacterList>
-              {searchResults.map((character) => (
-                <CharacterCard key={character.id}>
-                  <CardTopRow>
-                    <CardName>{character.name}</CardName>
-                  </CardTopRow>
-
-                  <CardRole>
-                    {character.role} · {character.crew}
-                  </CardRole>
-
-                  <CardBounty>{formatBounty(character.bounty)}</CardBounty>
-
-                  <CardDescription>{character.description}</CardDescription>
-
-                  <TagRow>
-                    <Tag>{character.affiliation}</Tag>
-                    {character.devilFruit && (
-                      <DevilFruitTag>{character.devilFruit}</DevilFruitTag>
-                    )}
-                  </TagRow>
-                </CharacterCard>
-              ))}
-            </CharacterList>
-          )}
-        </>
-      )}
+      {content}
     </Wrap>
   );
 };
