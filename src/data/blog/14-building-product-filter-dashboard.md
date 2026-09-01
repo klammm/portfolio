@@ -3,7 +3,7 @@
 title: "Building a Product Filter Dashboard"
 date: "2026-08-20"
 excerpt: "Search, category filter, price filter, and sort demo using Pokemon and One Piece Trading Cards as part of React state fundamentals practice."
-tags: ["react", "interview-prep"]
+tags: ["react"]
 demo: "product-filter-dashboard"
 --------------------------------
 

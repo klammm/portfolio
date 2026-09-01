@@ -22,12 +22,18 @@ export const demos: PlaygroundDemo[] = [
   },
   {
     slug: 'debounced-search',
-    title: 'Debounced Search and Stopwatch Timer',
-    description: 'Debounced Search and a Stopwatch Timer as part of state closures practice',
+    title: 'Debounced Search',
+    description: 'Debounced Search demo with One Piece anime characters as part of React state closures practice.',
     Component: lazy(() =>
       import('./demos/DebouncedSearch/DebouncedSearch').then((m) => ({ default: m.DebouncedSearch })),
     ),
   },
+  {
+    slug: 'stopwatch',
+    title: 'Stopwatch',
+    description: 'Stopwatch demo as part of React state closures practice',
+    Component: lazy(() => import('./demos/Stopwatch').then((m) => ({ default: m.Stopwatch }))),
+  }
 ];
 
 export function getDemoBySlug(slug: string): PlaygroundDemo | undefined {

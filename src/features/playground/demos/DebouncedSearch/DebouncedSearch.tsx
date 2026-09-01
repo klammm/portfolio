@@ -18,16 +18,6 @@ Build:
 -   empty state x
 -   error state x
 -   clear button x
-
-Additional Exercise
-
-Build a timer:
-
--   start
--   pause
--   reset
--   elapsed time
--   cleanup
 */
 
 const formatBounty = (bounty: number | null) => {
