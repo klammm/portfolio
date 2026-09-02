@@ -9,17 +9,17 @@ demo: "product-filter-dashboard"
 
 Day 1 of a study plan I'm working through: build a product filter dashboard from scratch, with local component state only. No state management library, no UI kit.
 
-I've been laid off since the beginning of this year, and one of my main goals right now is to join a startup in San Francisco. I've been doing a lot of interview prep, but I've realized that there's a difference between knowing React concepts and being able to actually build something from scratch while someone is sitting there watching you.
+I've been laid off since the beginning of this year, and one of my main goals right now is to get back into a startup in San Francisco. I've been doing a lot of interview prep, but I've realized there's a real difference between knowing React concepts and being able to actually build something from scratch while someone is sitting there watching you.
 
-When I'm coding by myself, it's completely fine to get stuck. I can make a mistake, stare at it for ten minutes, Google something, read the React docs, and eventually figure it out. That's part of how I normally learn.
+When I'm coding by myself, it's completely fine to get stuck. I can make a mistake, stare at it for ten minutes, Google something, read the docs, and eventually figure it out. That's just how I normally learn.
 
 An interview is obviously different.
 
-You're trying to remember syntax, reason about your state, explain your decisions, listen to another person, and debug something that isn't working, all while you're nervous and someone is watching you. I've realized that being able to implement React fundamentals under those conditions is a skill in itself.
+You're trying to remember syntax, reason about your state, explain your decisions out loud, listen to another person, and debug something that isn't working, all while you're nervous and someone is watching every move you make. Being able to implement React fundamentals under those conditions is honestly its own skill.
 
-So I'm revisiting a lot of the fundamentals that I already "know."
+So I'm going back through a lot of the fundamentals that I already "know."
 
-And Day 1 immediately exposed some gaps.
+Day 1 immediately exposed some gaps.
 
 The exercise was pretty simple. Build a product filter dashboard with:
 
@@ -39,26 +39,24 @@ The constraints were intentionally simple:
 * No state management library.
 * No UI component library.
 
-The live version is embedded below. I've been using Pokémon and One Piece trading cards for the data because, honestly, it's a lot more interesting than looking at a list of keyboards and office chairs.
+The live version is embedded below. I've been using Pokémon and One Piece trading cards for the data because, honestly, it's a lot more interesting than staring at a list of random items.
 
 
 ## Day 1
 
 ### Build exercise: Product Filter Dashboard
 
-The actual exercise wasn't particularly complicated, but I got tripped up on several things that I thought I already understood.
+The exercise itself wasn't particularly complicated, but I got tripped up on several things I thought I already understood, and that ended up being the most useful part of it.
 
-That's probably the most useful part of this exercise.
-
-I wasn't learning React from scratch. I was finding the places where my mental model of React wasn't quite as solid as I thought it was.
+I wasn't learning React from scratch. I was finding the places where my mental model wasn't quite as solid as I thought it was.
 
 ---
 
 ## 1. I was putting derived data into state
 
-The first thing I got stuck on was the search input and rendering the filtered list of products.
+The first thing I got stuck on was rendering the filtered list of products off the search input.
 
-My first instinct was to put the products into state and then use a `useEffect` that would run whenever the search query changed. Inside that effect, I would filter the products and then call `setState` with the filtered results.
+My first instinct was to put the products into state and then use a `useEffect` that would run whenever the search query changed. Inside that effect, I'd filter the products and call `setState` with the filtered results.
 
 Something along the lines of:
 
@@ -216,9 +214,9 @@ This was a good reminder that writing more conditions into one line doesn't make
 
 ## 4. I was mutating the array with `sort()`
 
-The sort filter was another one that confused me.
+The sort filter was another one that got me.
 
-I could get ascending and descending sorting to work, but when I selected "none" again, the list wouldn't return to the original order.
+I could get ascending and descending sorting to work fine, but when I switched back to "none," the list wouldn't return to its original order.
 
 My initial implementation was essentially:
 
@@ -316,7 +314,7 @@ Putting more things into state doesn't necessarily make the application easier t
 
 # State mutation and nested objects
 
-After the dashboard, I also went through some of the [React state exercises on react.dev website](https://react.dev/learn/adding-interactivity) around updating objects.
+After the dashboard, I also went through some of the [React state exercises on react.dev](https://react.dev/learn/adding-interactivity) around updating objects.
 
 This is another area where I know the rule:
 
