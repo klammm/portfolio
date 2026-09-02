@@ -15,11 +15,25 @@ export const demos: PlaygroundDemo[] = [
   {
     slug: 'product-filter-dashboard',
     title: 'Product Filter Dashboard',
-    description: ' Search, category filter, price filter, and sort demo using Pokemon and One Piece Trading Cards as part of my interview prep.',
+    description: ' Search, category filter, price filter, and sort demo using Pokemon and One Piece Trading Cards as part of state fundamentals practice.',
     Component: lazy(() =>
       import('./demos/ProductFilterDashboard/ProductFilterDashboard').then((m) => ({ default: m.ProductFilterDashboard })),
     ),
   },
+  {
+    slug: 'debounced-search',
+    title: 'Debounced Search',
+    description: 'Debounced Search demo with One Piece anime characters as part of React state closures practice.',
+    Component: lazy(() =>
+      import('./demos/DebouncedSearch/DebouncedSearch').then((m) => ({ default: m.DebouncedSearch })),
+    ),
+  },
+  {
+    slug: 'stopwatch',
+    title: 'Stopwatch',
+    description: 'Stopwatch demo as part of React state closures practice',
+    Component: lazy(() => import('./demos/Stopwatch').then((m) => ({ default: m.Stopwatch }))),
+  }
 ];
 
 export function getDemoBySlug(slug: string): PlaygroundDemo | undefined {
