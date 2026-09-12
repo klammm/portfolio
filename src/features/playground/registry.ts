@@ -33,6 +33,12 @@ export const demos: PlaygroundDemo[] = [
     title: 'Stopwatch',
     description: 'Stopwatch demo as part of React state closures practice',
     Component: lazy(() => import('./demos/Stopwatch').then((m) => ({ default: m.Stopwatch }))),
+  },
+  {
+    slug: 'api-client',
+    title: 'API Client',
+    description: 'API Client as part of HTTP concepts practice',
+    Component: lazy(() => import('./demos/ApiClient/ApiClient').then((m) => ({ default: m.ApiClient }))),
   }
 ];
 
