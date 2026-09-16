@@ -1,5 +1,5 @@
 export const api = {
-  async request(url: string, options: RequestInit = {}): Promise<unknown> {
+  async request<T = unknown>(url: string, options: RequestInit = {}): Promise<T> {
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -9,49 +9,49 @@ export const api = {
     });
 
     if (!response.ok) {
-      throw new Error(`Requeset failed: ${response.status}`);
+      throw new Error(`Request failed: ${response.status}`);
     }
 
     if (response.status === 204) {
-      return null;
+      return null as T;
     }
 
     return response.json();
   },
 
-  get(url: string, options: RequestInit = {}) {
-    return this.request(url, {
+  get<T = unknown>(url: string, options: RequestInit = {}) {
+    return this.request<T>(url, {
       method: "GET",
       ...options,
     });
   },
 
-  post(url: string, body: unknown, options: RequestInit = {}) {
-    return this.request(url, {
+  post<T = unknown, B = unknown>(url: string, body: B, options: RequestInit = {}) {
+    return this.request<T>(url, {
       method: "POST",
       body: JSON.stringify(body),
       ...options,
     });
   },
 
-  patch(url: string, body: unknown, options: RequestInit = {}) {
-    return this.request(url, {
+  patch<T = unknown>(url: string, body: unknown, options: RequestInit = {}) {
+    return this.request<T>(url, {
       method: "PATCH",
       body: JSON.stringify(body),
       ...options,
     });
   },
 
-  put(url: string, body: unknown, options: RequestInit = {}) {
-    return this.request(url, {
+  put<T = unknown>(url: string, body: unknown, options: RequestInit = {}) {
+    return this.request<T>(url, {
       method: "PUT",
       body: JSON.stringify(body),
       ...options,
     });
   },
 
-  delete(url: string, options: RequestInit = {}) {
-    return this.request(url, {
+  delete<T = unknown>(url: string, options: RequestInit = {}) {
+    return this.request<T>(url, {
       method: "DELETE",
       ...options,
     });
